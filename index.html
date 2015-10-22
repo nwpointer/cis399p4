@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Leaflet Layers Control Example</title>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.5/leaflet.css" />
+</head>
+<body>
+	<div id="map" style="width: 600px; height: 400px"></div>
+	<script src="http://cdn.leafletjs.com/leaflet-0.7.5/leaflet.js"></script>
+	<script src="http://www.mapquestapi.com/sdk/js/v7.2.s/mqa.toolkit.js?key=spA8Tolh5HJALmgWdq1jCm7pUL3K3FOT"></script>
+	<script>
+		MQA.withModule('geocoder', function(){});
+
+		var mbUrl = 'https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6IjZjNmRjNzk3ZmE2MTcwOTEwMGY0MzU3YjUzOWFmNWZhIn0.Y8bhBaUMqFiPrDRW9hieoQ';
+
+	    var streets  = L.tileLayer(mbUrl, {id: 'mapbox.streets'});
+	    var marker = new L.LayerGroup();
+
+		var map = L.map('map', {
+			center: [44.0522222, -123.0855556],
+			zoom: 12,
+			layers: [streets, marker]
+		});
+
+		function getAddress(res){
+			var place = res.results[0].locations[0];
+			var address = "".concat(place.street, " <br />", place.adminArea5, " ", place.adminArea3, ", ", place.adminArea1)
+			return address;
+		}
+
+		function onMapClick(e) {
+			var position = e.latlng;
+		   	MQA.Geocoder.reverse(position, null, null, function(res){
+		   		L.marker([position.lat, position.lng]).bindPopup(getAddress(res)).addTo(marker);
+		   	})
+		}
+
+		map.on('click', onMapClick);
+
+	</script>
+</body>
+</html>
